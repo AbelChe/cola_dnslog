@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       title: 'Cola Dnslog',
-      logo: '/sugerless.png'
+      logo: '/sugarless.png'
     }
   }
 }

@@ -1,5 +1,5 @@
 <div style="text-align:center;" width="100%">
-<img src="readme_resource/sugerless.png" alt="sugerless" width="250px" />
+<img src="readme_resource/sugarless.png" alt="sugarless" width="250px" />
 <img src="readme_resource/dnslog.png" alt="dnslog" width="250px" />
 </div>
 

@@ -20,7 +20,7 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img src="/sugerless.png" class="user-avatar">
+          <img src="/sugarless.png" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -53,7 +53,7 @@ export default {
     Hamburger,
     ErrorLog,
     Screenfull,
-    SizeSelect,
+    SizeSelect
     // Search
   },
   computed: {
@@ -69,8 +69,8 @@ export default {
     },
     async logout() {
       // await this.$store.dispatch('user/logout')
-      this.$cookieStore.delCookie("token")
-      localStorage.clear();
+      this.$cookieStore.delCookie('token')
+      localStorage.clear()
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }
