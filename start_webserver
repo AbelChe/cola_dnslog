@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd src/app/
+python server.py

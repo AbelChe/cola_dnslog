@@ -1,0 +1,12 @@
+import hashlib
+import config
+
+
+def password_hash(password: str) -> str:
+    try:
+        md5 = hashlib.md5(config.PASSWORD_SALT.encode('utf8'))
+        md5.update(password.encode('utf8'))
+        hashed_password = md5.hexdigest()
+        return hashed_password
+    except Exception as e:
+        print('[Error] ', e)

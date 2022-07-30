@@ -1,0 +1,6 @@
+dnslib==0.9.19
+fastapi==0.79.0
+SQLAlchemy==1.4.39
+uvicorn
+pyyaml
+python-multipart
