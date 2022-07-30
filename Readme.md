@@ -55,7 +55,7 @@
 下载源码
 
 ```sh
-git clone https://github.com/sugarlessCola/cola_dnslog.git
+git clone https://github.com/Abelche/cola_dnslog.git
 ```
 
 
