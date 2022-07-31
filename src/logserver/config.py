@@ -9,6 +9,9 @@ configfile.close()
 
 _db_filename = CONFIG.get('global').get('DB_FILENAME')
 
+# Templates path
+TEMPLATES_PATH = os.path.join(_cola_dir, 'message_templates')
+
 # Database config
 DB_PATH = os.path.join(_cola_dir, _db_filename)
 

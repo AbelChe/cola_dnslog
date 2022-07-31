@@ -2,9 +2,10 @@ from database import engine
 from pydantic import BaseModel
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from libs.auth import password_hash
+from libs.auth import password_hash, new_token
 from models import User
 from sqlalchemy.orm import sessionmaker
+from config import DNS_DOMAIN, SERVER_IP, HTTP_PORT, LDAP_PORT, RMI_PORT
 
 router = APIRouter(
     prefix="/user",
@@ -84,8 +85,7 @@ class userInfo(BaseModel):
 async def user_info_update(userinfo: userInfo, user: dict = Depends(get_current_user_info)):
     user_obj = Session.query(User).filter_by(token=user.get('token'))
     try:
-        userinfo.login = userinfo.logid.replace(' ', '').replace('\n', '').replace('\r', '').replace('\t', '')
-        if len(userinfo.logid) < 3:
+        if len(userinfo.logid.replace(' ', '').replace('\n', '').replace('\r', '').replace('\t', '')) < 3:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Server Error..."
@@ -100,3 +100,81 @@ async def user_info_update(userinfo: userInfo, user: dict = Depends(get_current_
             detail="Server Error..."
         )
     return {'code': 20000, 'message': 'Success', 'data': {}}
+
+class passwordData(BaseModel):
+    password: str
+    new_password: str
+
+@router.post('/info/change_password')
+async def change_password(passworddata: passwordData, user: dict = Depends(get_current_user_info)):
+    if len(passworddata.new_password) < 6:
+        return {'code': 50001, 'message': 'The password length should be at least 6 digits!', 'data': {}}
+    user_obj = Session.query(User).filter_by(token=user.get('token'))
+    if user_obj.first().hashed_password != password_hash(passworddata.password):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+    try:
+        user_obj.update({'hashed_password': password_hash(passworddata.new_password)})
+        Session.commit()
+        return {'code': 20000, 'message': 'Update success!', 'data': {}}
+    except Exception as e:
+        Session.rollback()
+        print('[SQL ERROR] ' + str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server Error..."
+        )
+
+@router.post('/new_token')
+async def genter_new_token(user: dict = Depends(get_current_user_info)):
+    user_obj = Session.query(User).filter_by(token=user.get('token'))
+    for i in range(3):
+        newtoken = new_token()
+        if not Session.query(User).filter_by(token=newtoken).first():
+            try:
+                user_obj.update({'token': newtoken})
+                Session.commit()
+                return {'code': 20000, 'message': 'Update success!', 'data': {}}
+            except Exception as e:
+                Session.rollback()
+                print('[SQL ERROR] ' + str(e))
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Server Error..."
+                )
+    raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Please try again......"
+            )
+
+@router.get('/get_my_server_info')
+async def get_my_server_domain(user: dict = Depends(get_current_user_info)):
+    data = {}
+    data['logid'] = user.get('logid')
+    data['domain'] = '{}.{}'.format(user.get('logid'), DNS_DOMAIN)
+    data['http'] = '{}:{}'.format(SERVER_IP, HTTP_PORT) if HTTP_PORT != 80 else '{}'.format(SERVER_IP)
+    data['ldap'] = '{}:{}'.format(SERVER_IP, LDAP_PORT) if LDAP_PORT != 80 else '{}'.format(SERVER_IP)
+    data['rmi'] = '{}:{}'.format(SERVER_IP, RMI_PORT) if RMI_PORT != 80 else '{}'.format(SERVER_IP)
+    return {'code': 20000, 'message': 'success', 'data': data}
+
+@router.get('/get_dingtalk_switch_status')
+async def get_dingtalk_switch_status(user: dict = Depends(get_current_user_info)):
+    user_obj = Session.query(User).filter_by(token=user.get('token'))
+    return {'code': 20000, 'message': 'success', 'data': {'status': user_obj.first().dingtalk_flag}}
+
+@router.get('/change_dingtalk_switch_status')
+async def set_dingtalk_switch_status(user: dict = Depends(get_current_user_info)):
+    user_obj = Session.query(User).filter_by(token=user.get('token'))
+    try:
+        status = (not user_obj.first().dingtalk_flag)
+        user_obj.update({'dingtalk_flag': status})
+        Session.commit()
+        return {'code': 20000, 'message': 'success', 'data': {'status': status}}
+    except Exception as e:
+        Session.rollback()
+        print('[SQL ERROR] ' + str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server Error..."
+        )

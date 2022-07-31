@@ -1,15 +1,24 @@
 import copy
 import os
 import tempfile
+import re
+import datetime
 
 from dnslib import QTYPE, RCODE, RR, TXT
 from dnslib.server import BaseResolver, DNSHandler, DNSLogger, DNSServer
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 
-from config import DNS_DOMAIN, NS1_DOMAIN, NS2_DOMAIN, SERVER_IP, DNS_PORT
+from config import DNS_DOMAIN, NS1_DOMAIN, NS2_DOMAIN, SERVER_IP, DNS_PORT, TEMPLATES_PATH
 from database import engine
 from models import Dnslog, User
 
+from utils import dingtalk_robot_message_sender, bark_message_sender
+
+# Load dingtalk template
+dingtalk_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'dingtalk', 'dnslog.md'))
+dingtalk_robot_message_template = dingtalk_robot_message_template_file.read()
+dingtalk_robot_message_template_file.close()
 
 Session_class = sessionmaker(bind=engine)
 Session = Session_class()
@@ -36,6 +45,7 @@ class RedisLogger():
     def log_request(self, handler, request):
         domain = request.q.qname.__str__().rstrip('.')
         print('new dnslog : domain--->{} \t type--->{} \t ip--->{}'.format(domain, QTYPE[request.q.qtype], handler.client_address[0]))
+        now = datetime.datetime.now()
         try:
             logids = domain.split('.')
             if len(logids) >= 3:
@@ -45,10 +55,11 @@ class RedisLogger():
             user_selectobj = Session.query(User).filter_by(logid=domain_id)
             user_selectdata = user_selectobj.first()
             if user_selectdata:
-                sql_obj = Dnslog(record=domain, ip_from=handler.client_address[0], owner_id=user_selectdata.id)
+                sql_obj = Dnslog(record=domain, ip_from=handler.client_address[0], record_time=func.now(), owner_id=user_selectdata.id)
                 Session.add(sql_obj)
                 Session.commit()
                 print('[+ SQL] domain--->{} \t type--->{} \t ip--->{}'.format(domain, QTYPE[request.q.qtype], handler.client_address[0]))
+                message_sender(sql_obj)
 
         except Exception as e:
             Session.rollback()
@@ -121,6 +132,19 @@ class ZoneResolver(BaseResolver):
         if not reply.rr:
             reply.header.rcode = RCODE.NXDOMAIN
         return reply
+
+def message_sender(data: Dnslog):
+    userobj = Session.query(User).filter_by(id=data.owner_id).first()
+    DingtalkFlag = userobj.dingtalk_flag
+    BarkFlag = userobj.bark_flag
+    if DingtalkFlag:
+        field_list = re.findall(r'\$\{.*?\}\$', dingtalk_robot_message_template)
+        message = dingtalk_robot_message_template
+        for i in field_list:
+            message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
+        dingtalk_robot_message_sender(userobj.dingtalk_robot_token, 'DNS请求 '+data.record, message)
+    if BarkFlag:
+        bark_message_sender()
 
 
 def start_server():

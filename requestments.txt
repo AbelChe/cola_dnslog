@@ -4,3 +4,4 @@ SQLAlchemy==1.4.39
 uvicorn
 pyyaml
 python-multipart
+requests
