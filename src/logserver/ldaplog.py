@@ -1,16 +1,25 @@
 import datetime
 import socket
 import threading
+import os
+import re
 
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 
-from config import LDAP_HOST, LDAP_PORT
+from config import LDAP_HOST, LDAP_PORT, TEMPLATES_PATH
 from database import engine
 from models import Ldaplog, User
+
+from utils import dingtalk_robot_message_sender, bark_message_sender
 
 LDAP_FINGERPRINT = b'\x30\x0c\x02\x01\x01\x60\x07\x02\x01\x03\x04\x00\x80\x00'
 LDAP_RETURN_1 = b'\x30\x0c\x02\x01\x01\x61\x07\x0a\x01\x00\x04\x00\x04\x00'
 
+# Load dingtalk template
+dingtalk_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'dingtalk', 'ldaplog.md'))
+dingtalk_robot_message_template = dingtalk_robot_message_template_file.read()
+dingtalk_robot_message_template_file.close()
 
 Session_class = sessionmaker(bind=engine)
 Session = Session_class()
@@ -36,11 +45,11 @@ def link_handler(link, client):
                     user_selectobj = Session.query(User).filter_by(logid=logid)
                     user_selectdata = user_selectobj.first()
                     if user_selectdata:
-                        sql_obj = Ldaplog(pathname=path, ip_from=client[0], owner_id=user_selectdata.id)
+                        sql_obj = Ldaplog(pathname=path, ip_from=client[0], record_time=func.now(), owner_id=user_selectdata.id)
                         Session.add(sql_obj)
                         Session.commit()
                         print('[+ SQL] pathname--->{} \t type--->{} \t ip--->{}'.format(path, 'LDAP', client[0]))
-
+                        message_sender(sql_obj)
                 except Exception as e:
                     Session.rollback()
                     print('[SQL ERROR] ' + path + ' ' + str(e))
@@ -57,6 +66,18 @@ def link_handler(link, client):
         break
     link.close()
 
+def message_sender(data: Ldaplog):
+    userobj = Session.query(User).filter_by(id=data.owner_id).first()
+    DingtalkFlag = userobj.dingtalk_flag
+    BarkFlag = userobj.bark_flag
+    if DingtalkFlag:
+        field_list = re.findall(r'\$\{.*?\}\$', dingtalk_robot_message_template)
+        message = dingtalk_robot_message_template
+        for i in field_list:
+            message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
+        dingtalk_robot_message_sender(userobj.dingtalk_robot_token, 'LDAP请求 '+data.pathname, message)
+    if BarkFlag:
+        bark_message_sender()
 
 def start_server():
     sk = socket.socket()

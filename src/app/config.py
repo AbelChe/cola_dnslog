@@ -18,3 +18,10 @@ PASSWORD_SALT = CONFIG.get('webserver').get('PASSWORD_SALT')
 # Fastapi server
 HOST = CONFIG.get('webserver').get('HOST')
 PORT = CONFIG.get('webserver').get('PORT')
+
+# Server info
+DNS_DOMAIN = CONFIG.get('logserver').get('DNS_DOMAIN')
+SERVER_IP = CONFIG.get('logserver').get('SERVER_IP')
+HTTP_PORT = CONFIG.get('logserver').get('HTTP_PORT')
+LDAP_PORT = CONFIG.get('logserver').get('LDAP_PORT')
+RMI_PORT = CONFIG.get('logserver').get('RMI_PORT')
