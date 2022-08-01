@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
-from routers.auth import user_access_token as access_token
-from sqlalchemy.orm import sessionmaker
 from database import engine
+from fastapi import APIRouter, Depends
 from models import User
+from sqlalchemy.orm import sessionmaker
+
+from routers.auth import user_access_token as access_token
 
 router = APIRouter(
     prefix="/httplog",

@@ -1,4 +1,5 @@
 import os
+
 import yaml
 
 _cola_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -25,6 +26,8 @@ DNS_PORT = CONFIG.get('logserver').get('DNS_PORT')
 # HTTP server config
 HTTP_HOST = CONFIG.get('logserver').get('HTTP_HOST')
 HTTP_PORT = CONFIG.get('logserver').get('HTTP_PORT')
+HTTP_RESPONSE_SERVER_VERSION = CONFIG.get('logserver').get('HTTP_RESPONSE_SERVER_VERSION')
+HTTP_RESPONSE_RESOURCE_PATH = os.path.join(_cola_dir, 'src', 'logserver', 'http_response_resource')
 
 # LDAP server config
 LDAP_HOST = CONFIG.get('logserver').get('LDAP_HOST')

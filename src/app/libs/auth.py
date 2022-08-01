@@ -1,7 +1,9 @@
 import hashlib
-import config
 import random
 import string
+
+import config
+
 
 def password_hash(password: str) -> str:
     try:
