@@ -72,3 +72,18 @@ export function changeDingtalkSwitchStatus(data) {
     data
   })
 }
+
+export function getBarkSwitchStatus() {
+  return request({
+    url: '/api/user/get_bark_switch_status',
+    method: 'get'
+  })
+}
+
+export function changeBarkSwitchStatus(data) {
+  return request({
+    url: '/api/user/change_bark_switch_status',
+    method: 'get',
+    data
+  })
+}

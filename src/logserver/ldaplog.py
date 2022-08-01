@@ -1,8 +1,8 @@
 import datetime
-import socket
-import threading
 import os
 import re
+import socket
+import threading
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
@@ -10,8 +10,7 @@ from sqlalchemy.sql import func
 from config import LDAP_HOST, LDAP_PORT, TEMPLATES_PATH
 from database import engine
 from models import Ldaplog, User
-
-from utils import dingtalk_robot_message_sender, bark_message_sender
+from utils import bark_message_sender, dingtalk_robot_message_sender
 
 LDAP_FINGERPRINT = b'\x30\x0c\x02\x01\x01\x60\x07\x02\x01\x03\x04\x00\x80\x00'
 LDAP_RETURN_1 = b'\x30\x0c\x02\x01\x01\x61\x07\x0a\x01\x00\x04\x00\x04\x00'
@@ -20,6 +19,10 @@ LDAP_RETURN_1 = b'\x30\x0c\x02\x01\x01\x61\x07\x0a\x01\x00\x04\x00\x04\x00'
 dingtalk_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'dingtalk', 'ldaplog.md'))
 dingtalk_robot_message_template = dingtalk_robot_message_template_file.read()
 dingtalk_robot_message_template_file.close()
+
+bark_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'bark', 'ldaplog.txt'))
+bark_robot_message_template = bark_robot_message_template_file.read()
+bark_robot_message_template_file.close()
 
 Session_class = sessionmaker(bind=engine)
 Session = Session_class()
@@ -77,7 +80,11 @@ def message_sender(data: Ldaplog):
             message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
         dingtalk_robot_message_sender(userobj.dingtalk_robot_token, 'LDAP请求 '+data.pathname, message)
     if BarkFlag:
-        bark_message_sender()
+        field_list = re.findall(r'\$\{.*?\}\$', bark_robot_message_template)
+        message = bark_robot_message_template
+        for i in field_list:
+            message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
+        bark_message_sender(userobj.bark_url, 'LDAP请求 - Cola Dnslog', message)
 
 def start_server():
     sk = socket.socket()

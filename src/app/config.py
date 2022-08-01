@@ -1,4 +1,5 @@
 import os
+
 import yaml
 
 _cola_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
