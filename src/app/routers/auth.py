@@ -1,11 +1,11 @@
+from config import DNS_DOMAIN, HTTP_PORT, LDAP_PORT, RMI_PORT, SERVER_IP
 from database import engine
-from pydantic import BaseModel
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from libs.auth import password_hash, new_token
+from libs.auth import new_token, password_hash
 from models import User
+from pydantic import BaseModel
 from sqlalchemy.orm import sessionmaker
-from config import DNS_DOMAIN, SERVER_IP, HTTP_PORT, LDAP_PORT, RMI_PORT
 
 router = APIRouter(
     prefix="/user",
@@ -169,6 +169,27 @@ async def set_dingtalk_switch_status(user: dict = Depends(get_current_user_info)
     try:
         status = (not user_obj.first().dingtalk_flag)
         user_obj.update({'dingtalk_flag': status})
+        Session.commit()
+        return {'code': 20000, 'message': 'success', 'data': {'status': status}}
+    except Exception as e:
+        Session.rollback()
+        print('[SQL ERROR] ' + str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server Error..."
+        )
+
+@router.get('/get_bark_switch_status')
+async def get_bark_switch_status(user: dict = Depends(get_current_user_info)):
+    user_obj = Session.query(User).filter_by(token=user.get('token'))
+    return {'code': 20000, 'message': 'success', 'data': {'status': user_obj.first().bark_flag}}
+
+@router.get('/change_bark_switch_status')
+async def set_bark_switch_status(user: dict = Depends(get_current_user_info)):
+    user_obj = Session.query(User).filter_by(token=user.get('token'))
+    try:
+        status = (not user_obj.first().bark_flag)
+        user_obj.update({'bark_flag': status})
         Session.commit()
         return {'code': 20000, 'message': 'success', 'data': {'status': status}}
     except Exception as e:

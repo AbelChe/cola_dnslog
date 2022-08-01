@@ -1,33 +1,52 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import base64
 import os
 import re
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 
+from config import (HTTP_HOST, HTTP_PORT, HTTP_RESPONSE_RESOURCE_PATH,
+                    HTTP_RESPONSE_SERVER_VERSION, TEMPLATES_PATH)
 from database import engine
 from models import Httplog, User
-
-import base64
-from config import HTTP_HOST, HTTP_PORT, TEMPLATES_PATH
-
-from utils import dingtalk_robot_message_sender, bark_message_sender
+from utils import bark_message_sender, dingtalk_robot_message_sender
 
 # Load dingtalk template
 dingtalk_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'dingtalk', 'httplog.md'))
 dingtalk_robot_message_template = dingtalk_robot_message_template_file.read()
 dingtalk_robot_message_template_file.close()
 
+bark_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'bark', 'httplog.txt'))
+bark_robot_message_template = bark_robot_message_template_file.read()
+bark_robot_message_template_file.close()
+
 Session_class = sessionmaker(bind=engine)
 Session = Session_class()
 
 class LogHTTPHandle(BaseHTTPRequestHandler):
+    server_version = HTTP_RESPONSE_SERVER_VERSION
+    sys_version = ''
+    tmpfile = open(os.path.join(HTTP_RESPONSE_RESOURCE_PATH, '1x1.gif'), 'rb')
+    response_file = tmpfile.read()
+    tmpfile.close()
+
+    def __response_200(self, file: bool=True):
+        self.send_response(200)
+        if file:
+            self.send_header("Content-Length", str(len(self.response_file)))
+            self.end_headers()
+            self.wfile.write(self.response_file)
+        else:
+            self.end_headers()
+
+
     def __auth(self):
         try:
             logids = next(i for i in self.path.split('/') if i)
             return logids
         except Exception as e:
-            self.send_response(200)
-            self.end_headers()
+            self.__response_200()
             return
 
     
@@ -37,12 +56,10 @@ class LogHTTPHandle(BaseHTTPRequestHandler):
             self.user_selectobj = Session.query(User).filter_by(logid=logid)
             self.user_selectdata = self.user_selectobj.first()
             if not self.user_selectdata:
-                self.send_response(200)
-                self.end_headers()
+                self.__response_200()
                 return
         except Exception as e:
-            self.send_response(200)
-            self.end_headers()
+            self.__response_200()
             return
         user_agent = self.headers.get('User-Agent')
         ip_from = self.client_address[0]
@@ -65,8 +82,7 @@ class LogHTTPHandle(BaseHTTPRequestHandler):
             f.close()
         finally:
             Session.close()
-        self.send_response(200)
-        self.end_headers()
+        self.__response_200()
 
     def do_GET(self):
         logid = self.__auth()
@@ -74,19 +90,16 @@ class LogHTTPHandle(BaseHTTPRequestHandler):
             self.user_selectobj = Session.query(User).filter_by(logid=logid)
             self.user_selectdata = self.user_selectobj.first()
             if not self.user_selectdata:
-                self.send_response(200)
-                self.end_headers()
+                self.__response_200()
                 return
         except Exception as e:
-            self.send_response(200)
-            self.end_headers()
+            self.__response_200()
             return
         user_agent = self.headers.get('user-agent')
         ip_from = self.client_address[0]
         request_method = 'GET'
         headers = str(self.headers)
         try:
-            print(self.headers.__class__)
             sql_obj = Httplog(headers=headers, path=self.path, request_method=request_method, ip_from=ip_from, useragent=user_agent, record_time=func.now(), owner_id=self.user_selectdata.id)
             Session.add(sql_obj)
             Session.commit()
@@ -103,8 +116,7 @@ class LogHTTPHandle(BaseHTTPRequestHandler):
             f.close()
         finally:
             Session.close()
-        self.send_response(200)
-        self.end_headers()
+        self.__response_200()
 
     def do_POST(self):
         logid = self.__auth()
@@ -116,8 +128,7 @@ class LogHTTPHandle(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
         except Exception as e:
-            self.send_response(200)
-            self.end_headers()
+            self.__response_200()
             return
         user_agent = self.headers.get('User-Agent')
         ip_from = self.client_address[0]
@@ -143,8 +154,7 @@ class LogHTTPHandle(BaseHTTPRequestHandler):
             f.close()
         finally:
             Session.close()
-        self.send_response(200)
-        self.end_headers()
+        self.__response_200()
 
 def message_sender(data: Httplog):
     userobj = Session.query(User).filter_by(id=data.owner_id).first()
@@ -157,7 +167,11 @@ def message_sender(data: Httplog):
             message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
         dingtalk_robot_message_sender(userobj.dingtalk_robot_token, 'HTTP请求 '+data.path, message)
     if BarkFlag:
-        bark_message_sender()
+        field_list = re.findall(r'\$\{.*?\}\$', bark_robot_message_template)
+        message = bark_robot_message_template
+        for i in field_list:
+            message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
+        bark_message_sender(userobj.bark_url, 'HTTP请求 - Cola Dnslog', message)
 
 def start_server():
     http_server = HTTPServer((HTTP_HOST, HTTP_PORT), LogHTTPHandle)

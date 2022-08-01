@@ -1,0 +1,1 @@
+DNS: ${record}$ ${ip_from}$ ${record_time}$

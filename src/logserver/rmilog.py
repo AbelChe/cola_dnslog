@@ -1,8 +1,8 @@
 import datetime
-import socket
-import threading
 import os
 import re
+import socket
+import threading
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
@@ -10,8 +10,7 @@ from sqlalchemy.sql import func
 from config import RMI_HOST, RMI_PORT, TEMPLATES_PATH
 from database import engine
 from models import Rmilog, User
-
-from utils import dingtalk_robot_message_sender, bark_message_sender
+from utils import bark_message_sender, dingtalk_robot_message_sender
 
 RMI_FINGERPRINT = b'\x4a\x52\x4d\x49\x00\x02\x4b'
 RMI_RETURN_1 = b'\x4e\x00\x0e\x31\x34\x2e\x31\x34\x39\x2e\x31\x35\x33\x2e\x32\x31\x32\x00\x00\x2f\xc9'
@@ -21,6 +20,10 @@ RMI_RETUEN_2 = b''
 dingtalk_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'dingtalk', 'rmilog.md'))
 dingtalk_robot_message_template = dingtalk_robot_message_template_file.read()
 dingtalk_robot_message_template_file.close()
+
+bark_robot_message_template_file = open(os.path.join(TEMPLATES_PATH, 'bark', 'rmilog.txt'))
+bark_robot_message_template = bark_robot_message_template_file.read()
+bark_robot_message_template_file.close()
 
 Session_class = sessionmaker(bind=engine)
 Session = Session_class()
@@ -93,7 +96,11 @@ def message_sender(data: Rmilog):
             message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
         dingtalk_robot_message_sender(userobj.dingtalk_robot_token, 'RMI请求 '+data.objectname, message)
     if BarkFlag:
-        bark_message_sender()
+        field_list = re.findall(r'\$\{.*?\}\$', bark_robot_message_template)
+        message = bark_robot_message_template
+        for i in field_list:
+            message = message.replace(i, str(getattr(data, i.replace('${', '').replace('}$', ''))))
+        bark_message_sender(userobj.bark_url, 'RMI请求 - Cola Dnslog', message)
 
 def start_server():
     sk = socket.socket()

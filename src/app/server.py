@@ -6,16 +6,16 @@ import string
 import sys
 
 import uvicorn
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import sessionmaker
-from libs.auth import password_hash
 
 from config import HOST, PORT
 from database import INSTALL, Base, engine
+from libs.auth import password_hash
 from models import Dnslog, Httplog, User
 from routers import auth, dnslog, httplog, ldaplog, rmilog
-from fastapi.middleware.cors import CORSMiddleware
 
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
