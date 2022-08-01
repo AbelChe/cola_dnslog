@@ -78,6 +78,8 @@ pip install -r requirements.txt
 
 主要需要修改`DNS_DOMAIN` `NS1_DOMAIN` `NS2_DOMAIN` `SERVER_IP`
 
+可选: 修改`HTTP_RESPONSE_SERVER_VERSION`伪造http返回中Server字段
+
 ```yaml
 global:
   DB_FILENAME: sqlite.db
@@ -90,6 +92,7 @@ logserver:
   DNS_PORT: 53
   HTTP_HOST: 0.0.0.0
   HTTP_PORT: 80
+  HTTP_RESPONSE_SERVER_VERSION: nginx
   LDAP_HOST: 0.0.0.0
   LDAP_PORT: 1389
   RMI_HOST: 0.0.0.0
@@ -171,7 +174,7 @@ python3 -m http.server 18001
 
 进入webui，修改Dingtalk Robot Token为上文获取的token，点击Update保存即可
 
-![image-20220801003459410](readme_resource/image-20220801003459410.png)
+![image-20220802020311279](readme_resource/image-20220802020311279.png)
 
 效果如下：
 
@@ -179,7 +182,17 @@ python3 -m http.server 18001
 
 ### Bark
 
-==TODO==
+[Finb/Bark: Bark is an iOS App which allows you to push custom notifications to your iPhone (github.com)](https://github.com/Finb/Bark)
+
+[Finb/bark-server: Backend of Bark (github.com)](https://github.com/Finb/bark-server)
+
+同上 进入webui，开启Bark开关，然后修改bark url，点击Update保存
+
+![image-20220802015907678](Readme_resource/image-20220802015907678.png)
+
+效果如下：
+
+<img src="readme_resource/image-20220802015642879.png" alt="image-20220802015642879" style="zoom: 25%;" />
 
 ### 如何使用
 
@@ -266,10 +279,22 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 ### 钉钉机器人
 
-<img src="readme_resource/image-20220731231301577.png" alt="image-20220731231301577" style="zoom:33%;" />
+<img src="readme_resource/image-20220731231301577.png" alt="image-20220731231301577" style="zoom: 25%;" />
+
+
+
+### Bark
+
+<img src="readme_resource/image-20220802015642879.png" alt="image-20220802015642879" style="zoom: 25%;" />
 
 ## 📔 更新日志
 
+- 2022-08-02 v1.2.0
+  1. 增加bark提醒功能
+  2. 修改logserver端http的返回为1x1的gif格式图片
+  3. 增加http返回包里`Server`字段的伪造功能
+  3. 修复前端profile页面开关bug
+  
 - 2022-08-01 v1.1.0
   1. 增加重新生成token、修改密码功能
   2. 优化前端展示效果，优化渲染速度
@@ -284,7 +309,9 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 ## 🎯 ==TODO==
 
 - [x] 联动钉钉【2022-07-31】 
-- [ ] 联动bark
+- [x] 联动bark【2022-08-02】
+- [ ] 添加api文档
+- [ ] 增加ip属地功能
 - [ ] docker一键部署
 - [ ] 其他协议
 

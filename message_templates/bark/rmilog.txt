@@ -1,0 +1,1 @@
+RMI: ${objectname}$ ${ip_from}$ ${record_time}$
