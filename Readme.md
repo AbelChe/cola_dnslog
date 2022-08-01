@@ -188,7 +188,7 @@ python3 -m http.server 18001
 
 同上 进入webui，开启Bark开关，然后修改bark url，点击Update保存
 
-![image-20220802015907678](Readme_resource/image-20220802015907678.png)
+![image-20220802015907678](readme_resource/image-20220802015907678.png)
 
 效果如下：
 
