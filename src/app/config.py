@@ -13,6 +13,9 @@ _db_filename = CONFIG.get('global').get('DB_FILENAME')
 # Database config
 DB_PATH = os.path.join(_cola_dir, _db_filename)
 
+# Save init info to file
+INIT_SERVER_INFO_FILE_PATH = os.path.join(_cola_dir, 'info.txt')
+
 # password md5 salt
 PASSWORD_SALT = CONFIG.get('webserver').get('PASSWORD_SALT')
 

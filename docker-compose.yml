@@ -1,0 +1,29 @@
+version: '3.0'
+services:
+  server:
+    container_name: ColaDnslog_server
+    build:
+      context: .
+      dockerfile: Dockerfile_server
+    environment:
+      DNS_DOMAIN: example.com
+      NS1_DOMAIN: ns1.example.com
+      NS2_DOMAIN: ns2.example.com
+      SERVER_IP: 1.1.1.1
+    ports:
+      - 53:53/udp
+      - 80:80
+      - 1099:1099
+      - 1389:1389
+      - 28001:28001
+    restart: on-failure
+  front:
+    container_name: ColaDnslog_front
+    build:
+      context: .
+      dockerfile: Dockerfile_front
+    environment:
+      API_BASE_URL: 'http://1.1.1.1:28001'
+    ports:
+      - 18080:80
+    restart: on-failure
