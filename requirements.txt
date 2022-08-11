@@ -5,3 +5,4 @@ uvicorn
 pyyaml
 python-multipart
 requests
+dnslib

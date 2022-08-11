@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import sessionmaker
 
-from config import HOST, PORT
+from config import HOST, PORT, INIT_SERVER_INFO_FILE_PATH
 from database import INSTALL, Base, engine
 from libs.auth import password_hash
 from models import Dnslog, Httplog, User
@@ -71,12 +71,15 @@ if INSTALL:
     sql_obj = User(name='admin', roles=roles, hashed_password=hashpwd, token=token, logid=logid)
     Session.add(sql_obj)
     Session.commit()
-    print('[+] -------------Add init user-------------')
-    print('[+] username: admin')
-    print('[+] password: {}'.format(password))
-    print('[+] token: {}'.format(token))
-    print('[+] logid: {}'.format(logid))
-    print('[+] ---------------------------------------')
+    info = '''[+] -------------Add init user-------------
+[+] username: admin
+[+] password: {0}
+[+] token: {1}
+[+] logid: {2}
+[+] ---------------------------------------'''.format(password, token, logid)
+    print(info)
+    with open(INIT_SERVER_INFO_FILE_PATH, 'w') as f:
+        f.write(info)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 

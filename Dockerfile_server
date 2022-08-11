@@ -1,0 +1,38 @@
+FROM ubuntu:18.04
+
+ENV DNS_DOMAIN=${DNS_DOMAIN}
+ENV NS1_DOMAIN=${NS1_DOMAIN}
+ENV NS2_DOMAIN=${NS2_DOMAIN}
+ENV SERVER_IP=${SERVER_IP}
+
+COPY src/app/ /coladnslog/src/app/
+COPY src/logserver/ /coladnslog/src/logserver/
+COPY message_templates/ /coladnslog/message_templates/
+COPY start_logserver /coladnslog/start_logserver
+COPY start_webserver /coladnslog/start_webserver
+COPY requirements.txt /coladnslog/requirements.txt
+COPY config.yaml /coladnslog/config.yaml
+COPY entrypoint_server.sh /
+
+RUN cd / && \
+    sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    apt update && \
+    apt upgrade -y && \
+    apt-get install -y python3.7 && \
+    apt-get install -y python3-pip && \
+    apt-get clean && apt-get autoclean && \
+    ln -s /usr/bin/python3.7 /usr/bin/python
+
+RUN cd /coladnslog && \
+    python -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+RUN chmod +x /entrypoint_server.sh && \
+    chmod +x /coladnslog/start_webserver && \
+    chmod +x /coladnslog/start_logserver
+
+EXPOSE 53/udp
+EXPOSE 80
+EXPOSE 1099
+EXPOSE 1389
+
+ENTRYPOINT [ "/entrypoint_server.sh" ]

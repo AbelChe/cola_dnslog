@@ -6,7 +6,6 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 
-
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -143,18 +142,17 @@ export const constantRoutes = [
       }
     ]
   },
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/documentation/index'),
-  //       name: 'Documentation',
-  //       meta: { title: 'Documentation', icon: 'documentation', affix: false, noCache: true }
-  //     }
-  //   ]
-  // },
+  {
+    path: 'documentation',
+    component: Layout,
+    children: [
+      {
+        path: 'https://abelche.github.io/cola_dnslog/',
+        name: 'Documentation',
+        meta: { title: 'API Documentation', icon: 'documentation', affix: false, noCache: true }
+      }
+    ]
+  }
 ]
 
 const createRouter = () => new Router({
