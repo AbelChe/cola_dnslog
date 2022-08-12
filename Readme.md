@@ -57,12 +57,21 @@
 ```sh
 git clone https://github.com/Abelche/cola_dnslog.git
 cd cola_dnslog
-docker-compose build
-# 这里需要手动关闭系统的53端口占用以及其他的端口占用情况
 docker-compose up -d
 ```
 
-如果需要自定义端口，请修改`docker-compose.yml`的端口映射`ports`即可
+启动之后查看docker日志或者查看info.txt获取账号信息
+
+> server端程序运行会在程序根目录创建一个info.txt用于记录初始化的账号信息
+
+```sh
+docker-compose logs
+docker exec -it <container_id> cat /coladnslog/info.txt
+```
+
+![image-20220812005813825](readme_resource/image-20220812005813825.png)
+
+> 如果需要自定义端口，请修改`docker-compose.yml`的端口映射`ports`即可
 
 ##### 前后端分离部署
 
@@ -337,24 +346,23 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 ## 📔 更新日志
 
+- 2022-08-12 v1.3.1
+  1. 修复docker部署方式dns端口冲突问题
+
 - 2022-08-12 v1.3.0
   1. 创建api文档https://abelche.github.io/cola_dnslog/
   2. 更新docker部署方式
   3. 修复部分显示问题
-
 - 2022-08-09 v1.2.2 v1.2.3
   1. 更新readme
   2. 修复文件名拼写错误
-
 - 2022-08-03 v1.2.1
   1. 更新readme
-
 - 2022-08-02 v1.2.0
   1. 增加bark提醒功能
   2. 修改logserver端http的返回为1x1的gif格式图片
   3. 增加http返回包里`Server`字段的伪造功能
   3. 修复前端profile页面开关bug
-  
 - 2022-08-01 v1.1.0
   1. 增加重新生成token、修改密码功能
   2. 优化前端展示效果，优化渲染速度
@@ -362,7 +370,6 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
   4. 首页Usage部分根据服务端自动生成
   5. 增加钉钉机器人
   6. 修复rmi协议解析bug
-
 - 2022-07-30 v1.0.0
   1. cola_dnslog发布 v1.0.0
 

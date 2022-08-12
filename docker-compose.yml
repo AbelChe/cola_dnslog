@@ -17,6 +17,7 @@ services:
       - 1389:1389
       - 28001:28001
     restart: on-failure
+    network_mode: host
   front:
     container_name: ColaDnslog_front
     build:
