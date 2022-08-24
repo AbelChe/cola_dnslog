@@ -5,4 +5,4 @@ uvicorn
 pyyaml
 python-multipart
 requests
-dnslib
+dnslib==0.9.19
