@@ -86,11 +86,15 @@ cd cola_dnslog
       NS1_DOMAIN: ns1.example.com # ns1绑定
       NS2_DOMAIN: ns2.example.com # ns2绑定
       SERVER_IP: 1.1.1.1 # vps ip
+      HTTP_PORT: 80 # httplog服务端口
+      HTTP_RESPONSE_SERVER_VERSION: nginx # httplog返回头的服务端信息Server: nginx
+      LDAP_PORT: 1389 # ldaplog服务端口
+      RMI_PORT: 1099 # rmilog服务端口
     ...
   front:
   	...
     environment:
-      API_BASE_URL: 'http://1.1.1.1:28001' # http://vpsip:28001
+      API_BASE_URL: 'http://1.1.1.1:28001' # http://vpsip:28001 / http://example.com:28001
     ...
 
 ```
@@ -231,7 +235,7 @@ chmod +x start_logserver
 现在来到前端（不一定要和webserver放在一起，你甚至可以通过electron打包成本地客户端），先修改配置文件`.env.production`
 
 ```sh
-cd src/app/front
+cd src/front
 vim .env.production
 ```
 
@@ -389,9 +393,13 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 
 ## 📔 更新日志
 
+- 2023-02-03 v1.3.2
+  1. 修改默认解析记录，domain[.]com和*[.]domain[.]com的A记录查询指向127.0.0.1，增加`md5(serverip)`[.]admin[.]domain[.]com作为域名访问的入口
+  2. 修复问题：logserver报错崩溃`Segmentation fault` [issues19](https://github.com/AbelChe/cola_dnslog/issues/19)
+  3. 支持多类型数据库，[issues21](https://github.com/AbelChe/cola_dnslog/issues/21)
+  4. 修改默认的docker前端部署方式（无需用户编译）
 - 2022-08-12 v1.3.1
   1. 修复docker部署方式dns端口冲突问题
-
 - 2022-08-12 v1.3.0
   1. 创建api文档https://abelche.github.io/cola_dnslog/
   2. 更新docker部署方式
@@ -430,7 +438,7 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 本项目使用 Apache License 2.0
 
 
-## 404星链计划
+## 🌟 404星链计划
 ![](https://github.com/knownsec/404StarLink-Project/raw/master/logo.png)
 
 Cola Dnslog 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)

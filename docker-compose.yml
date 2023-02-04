@@ -10,12 +10,10 @@ services:
       NS1_DOMAIN: ns1.example.com
       NS2_DOMAIN: ns2.example.com
       SERVER_IP: 1.1.1.1
-    ports:
-      - 53:53/udp
-      - 80:80
-      - 1099:1099
-      - 1389:1389
-      - 28001:28001
+      HTTP_PORT: 80 # httplog服务端口
+      HTTP_RESPONSE_SERVER_VERSION: nginx # httplog 返回头的服务端信息Server: nginx
+      LDAP_PORT: 1389 # ldaplog服务端口
+      RMI_PORT: 1099 # rmilog服务端口
     restart: on-failure
     network_mode: host
   front:
@@ -23,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_front
+    args:
+      VERSION: v1.3.2
     environment:
       API_BASE_URL: 'http://1.1.1.1:28001'
     ports:

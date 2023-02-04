@@ -31,6 +31,42 @@
             </el-checkbox>
         </div> -->
 
+    删除
+    <el-select v-model="value" placeholder="" style="width: 100px">
+      <el-option
+        v-for="item in options"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      />
+    </el-select>
+    条记录
+    <el-popover
+      v-model="visible2"
+      placement="top"
+      width="160"
+    >
+      <p>清空{{ value }}条记录？</p>
+      <div style="text-align: right; margin: 0">
+        <el-button size="mini" type="text" @click="visible2 = false">取消</el-button>
+        <el-button type="primary" size="mini" @click="Delete">确定</el-button>
+      </div>
+      <el-button slot="reference" type="danger" icon="el-icon-delete" />
+    </el-popover>
+
+    <el-popover
+      v-model="visible"
+      placement="top"
+      width="160"
+    >
+      <p>清空所有记录？</p>
+      <div style="text-align: right; margin: 0">
+        <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+        <el-button type="primary" size="mini" @click="Delete_All">确定</el-button>
+      </div>
+      <el-button slot="reference" type="danger" plain>清空记录</el-button>
+    </el-popover>
+
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -152,7 +188,7 @@
 </template>
 
 <script>
-import { fetchListDnslog, fetchPv, createArticle, updateArticle } from '@/api/logdata'
+import { fetchListDnslog, fetchPv, createArticle, updateArticle, deleteDnslog, deleteDnslog_all } from '@/api/logdata'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -189,6 +225,24 @@ export default {
   },
   data() {
     return {
+      options: [
+        {
+          value: '10',
+          label: '10'
+        }, {
+          value: '20',
+          label: '20'
+        }, {
+          value: '50',
+          label: '50'
+        }, {
+          value: '100',
+          label: '100'
+        }
+      ],
+      value: '',
+      visible: false,
+      visible2: false,
       tableKey: 0,
       list: null,
       total: 0,
@@ -246,6 +300,41 @@ export default {
     },
     iHeaderCellStyle: function({ row, column, rowIndex, columnIndex }) {
       return 'padding:5px'
+    },
+    Delete() {
+      var params = {
+        'size': this.value
+      }
+      deleteDnslog(params).then((res) => {
+        this.$notify({
+          title: '成功',
+          message: '成功删除' + this.value + '条记录',
+          type: 'success'
+        })
+        this.getList()
+      }).catch((err) => {
+        this.$notify.error({
+          title: '失败',
+          message: err
+        })
+        this.getList()
+      })
+    },
+    Delete_All() {
+      deleteDnslog_all().then((res) => {
+        this.$notify({
+          title: '成功',
+          message: '成功清空记录',
+          type: 'success'
+        })
+        this.getList()
+      }).catch((err) => {
+        this.$notify.error({
+          title: '失败',
+          message: err
+        })
+        this.getList()
+      })
     },
     getList() {
       this.listLoading = true

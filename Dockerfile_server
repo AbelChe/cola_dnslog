@@ -4,6 +4,10 @@ ENV DNS_DOMAIN=${DNS_DOMAIN}
 ENV NS1_DOMAIN=${NS1_DOMAIN}
 ENV NS2_DOMAIN=${NS2_DOMAIN}
 ENV SERVER_IP=${SERVER_IP}
+ENV HTTP_PORT=${HTTP_PORT}
+ENV HTTP_RESPONSE_SERVER_VERSION=${HTTP_RESPONSE_SERVER_VERSION}
+ENV LDAP_PORT=${LDAP_PORT}
+ENV RMI_PORT=${RMI_PORT}
 
 COPY src/app/ /coladnslog/src/app/
 COPY src/logserver/ /coladnslog/src/logserver/
@@ -16,9 +20,11 @@ COPY entrypoint_server.sh /
 
 RUN cd / && \
     sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    sed -i 's/security.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     apt update && \
     apt upgrade -y && \
     apt-get install -y python3.7 && \
+    apt-get install -y python3.7-dev && \
     apt-get install -y python3-pip && \
     apt-get clean && apt-get autoclean && \
     ln -s /usr/bin/python3.7 /usr/bin/python
