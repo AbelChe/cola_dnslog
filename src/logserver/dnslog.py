@@ -1,18 +1,19 @@
 import copy
 import datetime
+import hashlib
 import os
 import re
 import tempfile
 
-from dnslib import QTYPE, RCODE, RR, TXT
-from dnslib.server import BaseResolver, DNSHandler, DNSLogger, DNSServer
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql import func
-
 from config import (DNS_DOMAIN, DNS_PORT, NS1_DOMAIN, NS2_DOMAIN, SERVER_IP,
                     TEMPLATES_PATH)
 from database import engine
+from dnslib import QTYPE, RCODE, RR, TXT
+from dnslib.server import BaseResolver, DNSHandler, DNSLogger, DNSServer
 from models import Dnslog, User
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 from utils import bark_message_sender, dingtalk_robot_message_sender
 
 # Load dingtalk template
@@ -25,7 +26,8 @@ bark_robot_message_template = bark_robot_message_template_file.read()
 bark_robot_message_template_file.close()
 
 Session_class = sessionmaker(bind=engine)
-Session = Session_class()
+# Session = Session_class()
+Session = scoped_session(Session_class)
 
 class RedisLogger():
     def log_data(self, dnsobj):
@@ -48,22 +50,20 @@ class RedisLogger():
 
     def log_request(self, handler, request):
         domain = request.q.qname.__str__().rstrip('.')
-        print('new dnslog : domain--->{} \t type--->{} \t ip--->{}'.format(domain, QTYPE[request.q.qtype], handler.client_address[0]))
-        now = datetime.datetime.now()
+        print(datetime.datetime.now(), 'new dnslog : domain--->{} \t type--->{} \t ip--->{}'.format(domain, QTYPE[request.q.qtype], handler.client_address[0]))
         try:
             logids = domain.split('.')
             if len(logids) >= 3:
                 domain_id = logids[-3]
-            else:
-                return 1
-            user_selectobj = Session.query(User).filter_by(logid=domain_id)
-            user_selectdata = user_selectobj.first()
-            if user_selectdata:
-                sql_obj = Dnslog(record=domain, ip_from=handler.client_address[0], record_time=func.now(), owner_id=user_selectdata.id)
-                Session.add(sql_obj)
-                Session.commit()
-                print('[+ SQL] domain--->{} \t type--->{} \t ip--->{}'.format(domain, QTYPE[request.q.qtype], handler.client_address[0]))
-                message_sender(sql_obj)
+                user_selectobj = Session.query(User).filter_by(logid=domain_id)
+                user_selectdata = user_selectobj.first()
+                if user_selectdata:
+                    sql_obj = Dnslog(record=domain, ip_from=handler.client_address[0], record_time=func.now(), owner_id=user_selectdata.id)
+                    print('= = = = =|DOING| ADDING DATA...')
+                    Session.add(sql_obj)
+                    Session.commit()
+                    print(datetime.datetime.now(), '[+ SQL] domain--->{} \t type--->{} \t ip--->{}'.format(domain, QTYPE[request.q.qtype], handler.client_address[0]))
+                    message_sender(sql_obj)
 
         except Exception as e:
             Session.rollback()
@@ -75,7 +75,9 @@ class RedisLogger():
             f.write('\n----------------------------------------')
             f.close()
         finally:
+            print('= = = = =|DOING| CLOSE SESSION...')
             Session.close()
+            print('= = = = =|YES| CLOSE SESSION...')
 
 
     def log_send(self, handler, data):
@@ -106,42 +108,44 @@ class ZoneResolver(BaseResolver):
             Respond to DNS request - parameters are request packet & handler.
             Method is expected to return DNS response
         """
-        reply = request.reply()
+        try:
+            reply = request.reply()
 
-        qname = request.q.qname
-        qtype = QTYPE[request.q.qtype]
-        if qtype == 'TXT':
-            txtpath = os.path.join(tempfile.gettempdir(), str(qname).lower())
-            if os.path.isfile(txtpath):
-                reply.add_answer(
-                    RR(qname, QTYPE.TXT, rdata=TXT(open(txtpath).read().strip())))
-        for name, rtype, rr in self.zone:
-            # Check if label & type match
-            if getattr(qname,self.eq)(name) and (qtype == rtype or qtype == 'ANY' or rtype == 'CNAME'):
-                # If we have a glob match fix reply label
-                if self.glob:
-                    a = copy.copy(rr)
-                    a.rname = qname
-                    reply.add_answer(a)
-                else:
-                    reply.add_answer(rr)
-                # Check for A/AAAA records associated with reply and
-                # add in additional section
-                if rtype in ['CNAME', 'NS', 'MX', 'PTR']:
-                    for a_name, a_rtype, a_rr in self.zone:
-                        if a_name == rr.rdata.label and a_rtype in [
-                            'A', 'AAAA'
-                        ]:
-                            reply.add_ar(a_rr)
-        if not reply.rr:
-            reply.header.rcode = RCODE.NXDOMAIN
-        return reply
+            qname = request.q.qname
+            qtype = QTYPE[request.q.qtype]
+            if qtype == 'TXT':
+                txtpath = os.path.join(tempfile.gettempdir(), str(qname).lower())
+                if os.path.isfile(txtpath):
+                    reply.add_answer(
+                        RR(qname, QTYPE.TXT, rdata=TXT(open(txtpath).read().strip())))
+            for name, rtype, rr in self.zone:
+                # Check if label & type match
+                if getattr(qname,self.eq)(name) and (qtype == rtype or qtype == 'ANY' or rtype == 'CNAME'):
+                    # If we have a glob match fix reply label
+                    if self.glob:
+                        a = copy.copy(rr)
+                        a.rname = qname
+                        reply.add_answer(a)
+                    else:
+                        reply.add_answer(rr)
+                    # Check for A/AAAA records associated with reply and
+                    # add in additional section
+                    if rtype in ['CNAME', 'NS', 'MX', 'PTR']:
+                        for a_name, a_rtype, a_rr in self.zone:
+                            if a_name == rr.rdata.label and a_rtype in [
+                                'A', 'AAAA'
+                            ]:
+                                reply.add_ar(a_rr)
+            if not reply.rr:
+                reply.header.rcode = RCODE.NXDOMAIN
+            return reply
+        except Exception as e:
+            print(e)
 
 def message_sender(data: Dnslog):
     userobj = Session.query(User).filter_by(id=data.owner_id).first()
     DingtalkFlag = userobj.dingtalk_flag
     BarkFlag = userobj.bark_flag
-    print(BarkFlag)
     if DingtalkFlag:
         field_list = re.findall(r'\$\{.*?\}\$', dingtalk_robot_message_template)
         message = dingtalk_robot_message_template
@@ -160,7 +164,7 @@ def start_server():
     zone = '''
 *.{dnsdomain}.       IN      NS      {ns1domain}.
 *.{dnsdomain}.       IN      NS      {ns2domain}.
-*.{dnsdomain}.       IN      A       {serverip}
+*.{dnsdomain}.       IN      A       127.0.0.1
 {dnsdomain}.       IN      A       {serverip}
 '''.format(
         dnsdomain=DNS_DOMAIN,

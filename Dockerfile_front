@@ -1,33 +1,27 @@
 FROM ubuntu:18.04
 
-ENV API_BASE_URL=${API_BASE_URL}
+ARG VERSION
 
-COPY src/front/ /front/
+ENV API_BASE_URL=${API_BASE_URL}
+ENV VERSION=${VERSION}
+
 COPY nginx.site.default.conf /
 COPY entrypoint_front.sh /
 
 RUN cd / && \
     sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    sed -i 's/security.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     apt update && \
     apt upgrade -y && \
     apt-get install -y nginx && \
-    apt-get install -y git && \
     apt-get install -y wget && \
-    apt-get install -y xz-utils && \
-    apt-get clean && apt-get autoclean && \
-    wget https://nodejs.org/dist/v16.16.0/node-v16.16.0-linux-x64.tar.xz && \
-    tar xf node-v16.16.0-linux-x64.tar.xz && \
-    rm -rf node-v16.16.0-linux-x64.tar.xz && \
-    ln -s /node-v16.16.0-linux-x64/bin/npm   /usr/local/bin/ && \
-    ln -s /node-v16.16.0-linux-x64/bin/node   /usr/local/bin/ && \
-    npm config set registry https://registry.npm.taobao.org && \
-    git config --global url."https://".insteadOf git://
+    apt-get clean && apt-get autoclean
 
-RUN cd /front && \
-    npm install && \
-    npm run build:prod && \
-    rm -rf /var/www/html/* && \
-    mv /front/dist/* /var/www/html/
+RUN cd /tmp && \
+    wget https://github.com/AbelChe/cola_dnslog/releases/download/${VERSION}/cola_dnslog-front.tar.gz
+
+RUN rm -rf /var/www/html/* && \
+    tar -zxvf /tmp/cola_dnslog-front.tar.gz -C /var/www/html/
 
 RUN mv /nginx.site.default.conf /etc/nginx/sites-enabled/default && \
     chmod +x /entrypoint_front.sh
