@@ -129,15 +129,16 @@ git clone https://github.com/Abelche/cola_dnslog.git
 cd cola_dnslog
 
 docker build -t coladnslog_server -f Dockerfile_server .
-docker run -itd -p 53:53/udp \
--p 80:80 \
--p 1099:1099 \
--p 1389:1389 \
--p 28001:28001 \
+docker run -itd \
 -e DNS_DOMAIN=example.com \
 -e NS1_DOMAIN=ns1.example.com \
 -e NS2_DOMAIN=ns2.example.com \
 -e SERVER_IP=1.1.1.1 \
+-e HTTP_PORT=80 \
+-e HTTP_RESPONSE_SERVER_VERSION=nginx \
+-e LDAP_PORT=1389 \
+-e RMI_PORT=1099 \
+--net=host \
 --name ColaDnslog_server coladnslog_server
 ```
 
@@ -147,8 +148,11 @@ docker run -itd -p 53:53/udp \
 git clone https://github.com/Abelche/cola_dnslog.git
 cd cola_dnslog
 
-sudo docker build -t coladnslogfront -f Dockerfile_front .
-sudo docker run -itd -p 18080:18080 coladnslogfront
+sudo docker build --build-arg VERSION=v1.3.2 -t coladnslog_front -f Dockerfile_front .
+sudo docker run -itd \
+-p 18080:80 \
+-e "API_BASE_URL=http://1.2.3.4:28001" \
+--name ColaDnslog_front coladnslog_front
 ```
 
 
@@ -396,7 +400,6 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 - 2023-02-03 v1.3.2
   1. 修改默认解析记录，domain[.]com和*[.]domain[.]com的A记录查询指向127.0.0.1，增加`md5(serverip)`[.]admin[.]domain[.]com作为域名访问的入口
   2. 修复问题：logserver报错崩溃`Segmentation fault` [issues19](https://github.com/AbelChe/cola_dnslog/issues/19)
-  3. 支持多类型数据库，[issues21](https://github.com/AbelChe/cola_dnslog/issues/21)
   4. 修改默认的docker前端部署方式（无需用户编译）
 - 2022-08-12 v1.3.1
   1. 修复docker部署方式dns端口冲突问题
@@ -432,6 +435,7 @@ ${jndi:rmi://1.1.1.1:1099/rmiqrq}
 - [ ] 增加ip属地功能
 - [x] docker一键部署【2022-08-12】
 - [ ] 其他协议
+- [ ] 增加mysql等数据库的支持
 
 ## 📜 声明
 

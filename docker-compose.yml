@@ -21,8 +21,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_front
-    args:
-      VERSION: v1.3.2
+      args:
+        VERSION: v1.3.2
     environment:
       API_BASE_URL: 'http://1.1.1.1:28001'
     ports:
