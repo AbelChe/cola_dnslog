@@ -36,9 +36,4 @@ RUN chmod +x /entrypoint_server.sh && \
     chmod +x /coladnslog/start_webserver && \
     chmod +x /coladnslog/start_logserver
 
-EXPOSE 53/udp
-EXPOSE 80
-EXPOSE 1099
-EXPOSE 1389
-
 ENTRYPOINT [ "/entrypoint_server.sh" ]
